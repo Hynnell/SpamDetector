@@ -1,0 +1,15 @@
+YouTube Content:
+
+https://youtu.be/cNLPt02RwF0
+https://youtu.be/N-hJTaM9dEI
+
+
+Web Content: 
+
+https://medium.com/@randerson112358/email-spam-detection-using-python-machine-learning-abe38c889855
+https://towardsdatascience.com/spam-classifier-in-python-from-scratch-27a98ddd8e73
+
+
+GitHub Content:
+
+https://github.com/randerson112358/Python/blob/master/Email_Spam_Detection/Email_Spam_Detection.ipynb
