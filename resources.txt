@@ -7,9 +7,19 @@ https://youtu.be/N-hJTaM9dEI
 Web Content: 
 
 https://medium.com/@randerson112358/email-spam-detection-using-python-machine-learning-abe38c889855
+
 https://towardsdatascience.com/spam-classifier-in-python-from-scratch-27a98ddd8e73
+
+https://www.kdnuggets.com/2017/03/email-spam-filtering-an-implementation-with-python-and-scikit-learn.html
 
 
 GitHub Content:
 
 https://github.com/randerson112358/Python/blob/master/Email_Spam_Detection/Email_Spam_Detection.ipynb
+
+
+Feedback on Proposal: 
+
+While machine learning is currently a hot topic for security, spam detection is a relatively old topic. Further, building a machine learning model is relatively easy using libraries such as scikit-learn or keras. In your report, I would suggest you (1) study and comprehensively describe the machine learning model you choose for spam detection and provide a solid reasoning why this is the model you choose (e.g., not just "GPT-2 is powerful for NLP"), (2) identify ~5 different features to use for the models (e.g., letter, word, sentence), (3) identify ~5 important hyper-parameters for the model (e.g., number of layers in the neural network, dropout degree, or kernel for the SVM), and (4) compare and contrast the various methodologies efficacy across multiple datasets.
+
+
