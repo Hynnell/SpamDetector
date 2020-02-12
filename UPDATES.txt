@@ -1,0 +1,5 @@
+Lucas:
+	- 2/12:
+	- Bug fixes for model.py
+	- Used sklearn for SVC and Naive Bayes model implementation
+	- model.py now shows accuracy for both models

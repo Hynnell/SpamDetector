@@ -1,6 +1,10 @@
 from collections import Counter
 import os
 import numpy as np
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
+from sklearn.metrics import confusion_matrix
+
 
 '''
 TODO: 
@@ -23,7 +27,6 @@ def count_words(directory):
 				track_words += words # Add each word to total count
 
 	count_words = Counter(track_words) # Count frequency of each word
-	
 
 	# This portion removes unwanted features:
 	# meaningless words, non-alphabetic characters...
@@ -36,7 +39,7 @@ def count_words(directory):
 			del count_words[elem]
 
 	count_words = count_words.most_common(3000) # Take the most common 3000 words
-	print(count_words)
+	# print(count_words)
 	return count_words
 
 def extract_features(directory, dictionary):
@@ -57,25 +60,84 @@ def extract_features(directory, dictionary):
 							wordID = i
 							features_matrix[docID, wordID] = words.count(word)
 			docID += 1
-	print(test)
+
+	# print("Length of features matrix:", len(features_matrix))
 	return features_matrix
 
 
 def main():
 	# Test Email
+	'''
+	Lingspam_public data set
+		- 4 categories
+		- 10 parts each
+		- Each part has 48 spam and 242 ham
+	'''
 
-	training = "./data/enron1/spam"
-	dictionary = count_words(training) #Creates a dictionary containing frequencies of words.
+	# File paths
+	training2 = "./data/lingspam_public/bare/part1"
+	testing1 = './data/lingspam_public/bare/part1'
+	
+	# =========================== TRAINING ===========================
 
-	train_labels = np.zeros(702)
-	train_labels[351:701] = 1
+	dictionary = count_words(training2) #Creates a dictionary containing frequencies of words.
+	
+	# Creating our labels, 1 indicates spam, 0 indicates ham
+	train_labels = np.zeros(289)
+	train_labels[241:288] = 1
+	train_matrix = extract_features(training2, dictionary)
+	
+	# Initialize models
+	model1 = LinearSVC()
+	model2 = MultinomialNB()
 
-	train_matrix = extract_features(training, dictionary)
+	# Fitting the models for later use
+	model1.fit(train_matrix, train_labels)
+	model2.fit(train_matrix, train_labels)
 
-	# print(train_matrix)
+	# ================================================================
 
 
+	# ============================ TESTING ===========================
+	# Testing unseen data
+	test_matrix = extract_features(testing1, dictionary)
+	
+	# Creating our labels, 1 indicates spam, 0 indicates ham
+	test_labels = np.zeros(289)
+	test_labels[241:288] = 1
+
+	result1 = model1.predict(test_matrix)
+	result2 = model2.predict(test_matrix)
+
+	# ================================================================
+
+
+	# ============================ RESULTS ===========================
+	'''
+	Notes about the confusion matrix: 
+
+	In binary classification, the count of:
+	true negatives is C[0,0] <- want this high
+	false negatives is C[1,0]
+	true positives is C[1,1] <- want this high
+	false positives is C[0,1].
+	'''
+
+	# Results for LinearSVC() model
+	c1 = confusion_matrix(test_labels,result1)
+	c1_acc = (c1[0,0] + c1[1,1])/len(test_labels)
+	print("Support Vector Classification Accuracy:", c1_acc)
+
+	# Results for MultinomialNB() model
+	c2 = confusion_matrix(test_labels,result2)
+	c2_acc = (c2[0,0] + c2[1,1])/len(test_labels)
+	print("Naive Bayes Accuracy:", c2_acc)
+
+	# ================================================================
 
 
 if __name__ == '__main__':
 	main()
+
+
+

@@ -24,7 +24,7 @@ def make_Dictionary(train_dir):
     
     dictionary = Counter(all_words)
     
-    list_to_remove = dictionary.keys()
+    list_to_remove = list(dictionary.keys())
     for item in list_to_remove:
         if item.isalpha() == False: 
             del dictionary[item]
