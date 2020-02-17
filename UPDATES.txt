@@ -12,6 +12,4 @@ knn implementation working for datasets. ~80% accuracy
 
 
 NOTES:
-model.py doesn't work for me. ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-  "the number of iterations.", ConvergenceWarning)
-THIS IS BEFORE I TOUCHED ANYTHING ^^^^
+

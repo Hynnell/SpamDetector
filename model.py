@@ -27,7 +27,7 @@ false negatives is C[1,0]
 true positives is C[1,1] <- want this high
 false positives is C[0,1].
 '''
-def svcmodel(train_matrix, train_labels, test_labels):
+def svcmodel(train_matrix, train_labels, test_matrix, test_labels):
 	#Initialize Model
 	model1 = LinearSVC()
 	model1.fit(train_matrix, train_labels)
@@ -37,7 +37,7 @@ def svcmodel(train_matrix, train_labels, test_labels):
 	acc = (c1[0,0] + c1[1,1])/len(test_labels)
 	return acc
 
-def nbmodel(train_matrix, train_labels, test_labels):
+def nbmodel(train_matrix, train_labels, test_matrix, test_labels):
 	# Initialize model
 	model2 = MultinomialNB()
 	# Fitting the models for later use
@@ -79,8 +79,8 @@ def models():
 	test_labels = np.zeros(289)
 	test_labels[241:288] = 1
 
-	c1_acc = svcmodel(train_matrix, train_labels, test_labels)
-	c2_acc = nbmodel(train_matrix, train_labels, test_labels) 
+	c1_acc = svcmodel(train_matrix, train_labels, test_matrix, test_labels)
+	c2_acc = nbmodel(train_matrix, train_labels, test_matrix, test_labels) 
 
 	# ============================ RESULTS ===========================
 	print("Support Vector Classification Accuracy:", c1_acc)
