@@ -29,24 +29,29 @@ def count_words(directory):
 
 def extract_features(directory, dictionary):
 	files = [os.path.join(directory,file) for file in os.listdir(directory)]
-	features_matrix = np.zeros((len(files), 3000)) # Generate size of matrix containing vectors.
+
+	# Create the matrix to store the features
+	features_matrix = np.zeros((len(files), 3000))
+	# print(features_matrix)
+
 	docID = 0
-	test = []
+	# traceback = [] #This is used to correlate words for the feedback
+
 	for emails in files:
 		with open(emails, encoding="latin-1") as email:
 			for line in email:
 				words = line.split() # Create list of words on a line
-				for word in words: # Ok 
+				for word in words:
 					wordID = 0
-					for i,d in enumerate(dictionary):
-						if d[0] == word:
-							l = [d[0], i]
-							test.append(l)
+					for i,d in enumerate(dictionary): # Here i is the index and d is the word
+						if d[0] == word: # d[0] is the word, d[1] is the frequency.
 							wordID = i
-							features_matrix[docID, wordID] = words.count(word)
-			docID += 1
+							# traceback[i] = d[0]
+							features_matrix[docID, wordID] = 1 # Set the occurrence of that word.
+							# features_matrix[docID, wordID] = word.count(word) # Original sets the frequency
 
-	# print("Length of features matrix:", len(features_matrix))
+			docID += 1 #Increment the index to indicate which email we are at.
+
 	return features_matrix
 
 
