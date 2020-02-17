@@ -1,0 +1,16 @@
+GUI: 
+- Button for importing training data
+- Button for training the model
+- Button for testing a single email
+
+- Visualize information such as most common spam words and how many emails were spam.
+
+
+
+Models:
+-Implement perceptron model?
+
+
+
+Data saving: 
+-Find a way to save models so that user does not need to train each time.

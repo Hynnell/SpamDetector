@@ -6,3 +6,6 @@ Reached out to owner of datasets (in Greece) and received permission to use in r
 Bug fixes for model.py
 Used sklearn for SVC and Naive Bayes model implementation
 model.py now shows accuracy for both models
+
+2/16:
+knn implementation working for datasets. ~80% accuracy
