@@ -68,7 +68,7 @@ def main():
 	test_x = extract_features(testing, final_words_test)
 
 	#Normalizing data here
-	train_x, test_x = rangenorm(train_x, test_x)
+	# train_x, test_x = rangenorm(train_x, test_x)
 	# train_x, test_x = varnorm(train_x, test_x)
 	# train_x, test_x = exnorm(train_x, test_x)
 
