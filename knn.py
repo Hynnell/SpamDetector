@@ -1,13 +1,13 @@
 import numpy as np
-
 from extract import *
+from normalize import *
 
 # Distance between instances x1 and x2
 def dist(x1, x2):
-  # TODO: YOUR CODE HERE
-  dist = np.linalg.norm(x1-x2)
-  dist = dist**2
-  return dist
+	# TODO: YOUR CODE HERE
+	dist = np.linalg.norm(x1-x2)
+	dist = dist**2
+	return dist
 
 
 def classify(train_x, train_y, k, x):
@@ -66,6 +66,11 @@ def main():
 	final_words_test = count_words(testing)
 	# final_words_test = remove_stop_words(counted_test)
 	test_x = extract_features(testing, final_words_test)
+
+	#Normalizing data here
+	train_x, test_x = rangenorm(train_x, test_x)
+	# train_x, test_x = varnorm(train_x, test_x)
+	# train_x, test_x = exnorm(train_x, test_x)
 
 	# Creating our labels, 1 indicates spam, -1 indicates ham
 	train_y = np.zeros(289)

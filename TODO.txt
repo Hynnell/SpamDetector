@@ -14,3 +14,9 @@ Models:
 
 Data saving: 
 -Find a way to save models so that user does not need to train each time.
+
+
+Poster/Presentation:
+- Test with different amounts of data (train 10 emails, 100 emails, 1000, ...)
+- Graph different tests
+- Graph before and after normalization.
