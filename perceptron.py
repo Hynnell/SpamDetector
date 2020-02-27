@@ -81,7 +81,7 @@ def main():
   test_y[0:240] = -1
   test_y[241:288] = 1
 
-  (w,b) = train_perceptron(train_x, train_y, maxiter=100)
+  (w,b) = train_perceptron(train_x, train_y, 60)
 
   correct = 0
   for (x,y) in zip(test_x, test_y):
