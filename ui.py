@@ -55,6 +55,7 @@ def exitProgram():
 #Creating a root and initializing attributes (foundation for GUI)
 root = Tk() #Establishes structure for app window
 root.geometry('500x300')
+root.resizable(False, False)
 root.title("Spam Detector")
 root.protocol("WM_DELETE_WINDOW", exitProgram)  # calls closeWindow() if user clicks red 'x'
 
