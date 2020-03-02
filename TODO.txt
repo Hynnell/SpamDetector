@@ -8,12 +8,13 @@ GUI:
 
 
 Models:
--Implement perceptron model?
+-Implement perceptron model DONE
+-Implement decision tree model
 
 
 
 Data saving: 
--Find a way to save models so that user does not need to train each time.
+-Find a way to save models so that user does not need to train each time. DONE
 
 
 Poster/Presentation:

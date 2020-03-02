@@ -60,6 +60,7 @@ def main():
   final_words_train = count_words(training)
   # final_words_train = remove_stop_words(counted_train)
   train_x = extract_features(training, final_words_train)
+  store_data(train_x)
 
   # Read data from testing
   final_words_test = count_words(testing)

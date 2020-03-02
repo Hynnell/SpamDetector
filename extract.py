@@ -2,6 +2,10 @@ from collections import Counter
 import os
 import numpy as np
 
+#====================================================================
+#========================== FREQUENCY DICT ==========================
+#====================================================================
+
 def count_words(directory):
 	emails = [os.path.join(directory,file) for file in os.listdir(directory)] 
 	track_words = []
@@ -24,12 +28,17 @@ def count_words(directory):
 			del count_words[elem]
 
 	count_words = count_words.most_common(3000) # Take the most common 3000 words
+	
 	# print(count_words)
 	return count_words
 
-def store_data(feature_matrix):
+#====================================================================
+#=========================== DATA STORAGE ===========================
+#====================================================================
+
+def store_matrix(feature_matrix):
 	# Stores the feature_matrix to the data.txt file
-	with open('storage/data.txt', 'w') as file:
+	with open('storage/matrix.txt', 'w') as file:
 		for row in feature_matrix:
 			length = len(row)
 			for i in range(length):
@@ -40,17 +49,29 @@ def store_data(feature_matrix):
 					file.write(str(row[i]))
 			file.write("\n")
 
-def read_data():
+def store_dict(dictionary): # Stores the dictionary inside of data.txt in storage
+	with open('storage/data.txt', 'w') as file:
+		i = 0
+		for word,freq in dictionary:
+			i += 1
+			if i == 3000:
+				file.write(str(word))
+				break
+
+			file.write(str(word))
+			file.write("\n")
+
+def read_matrix():
 	# Reads the feature_matrix from the data.txt file
 	count = 0
-	file = open('storage/data.txt', 'r')
-	for line in file:
+	file = open('storage/matrix.txt', 'r')
+	for line in file: # Determine how many emails (rows of matrix) there are
 		count += 1
 
 	print(count)
 	features_matrix = np.zeros((count, 3000))
 
-	with open('storage/data.txt', 'r') as file:
+	with open('storage/matrix.txt', 'r') as file:
 		count = 0
 		for row in file:
 			i = 0
@@ -63,7 +84,31 @@ def read_data():
 
 	return features_matrix
 
+
+def read_dict():
+	with open('storage/data.txt', 'r') as file:
+		words = ['' for i in range(3000)]
+		i = 0
+		for line in file:
+			if i == 2999: # Last line doesn't have a newline
+				words[i] = line
+				break
+
+			words[i] = line[0:-1]
+			i += 1
+
+	return words
+
+#====================================================================
+#==========================FEATURE MATRIX============================
+#====================================================================
+
 def extract_features(directory, dictionary):
+	'''
+	directory: where to find the data
+	dictionary: 300 most common words within the directory
+	toStore: used for storage, only store the matrix for training (no need to store for testing)
+	'''
 	files = [os.path.join(directory,file) for file in os.listdir(directory)]
 
 	# Create the matrix to store the features
@@ -87,15 +132,23 @@ def extract_features(directory, dictionary):
 							# features_matrix[docID, wordID] = word.count(word) # Original sets the frequency
 
 			docID += 1 #Increment the index to indicate which email we are at.
-
-	store_data(features_matrix)
+	
 	return features_matrix
 
-def extract_features_single(file, dictionary):
+# Function to test a single email against a feature matrix
+def extract_single(file):
 
 	# Create the matrix to store the features
+	# feature_matrix = read_matrix()
+	dictionary = read_dict()
+	
+	'''
+	Vector specific to the email
+	Populate this based on dictionary
+	Compare it to the feature matrix. 
+	'''
 	features_vector = np.zeros(3000)
-	# print(features_matrix)
+
 
 	with open(file, encoding="latin-1") as email:
 		for line in email:
@@ -103,12 +156,28 @@ def extract_features_single(file, dictionary):
 			for word in words:
 				wordID = 0
 				for i,d in enumerate(dictionary): # Here i is the index and d is the word
-					if d[0] == word: # d[0] is the word, d[1] is the frequency.
+					if d == word: # d[0] is the word, d[1] is the frequency.
 						wordID = i
 						features_vector[wordID] = 1 # Set the occurrence of that word.
 
-	print(features_vector)
+	# print(features_vector)
 	return features_vector # Singular feature vector for email. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

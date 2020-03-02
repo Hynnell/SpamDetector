@@ -50,17 +50,23 @@ def runTest(test_x, test_y, train_x, train_y, k):
 	return acc
 
 
-
 def main():
 
 	# File Paths
 	training = "./data/lingspam_public/bare/part1"
 	testing = "./data/lingspam_public/bare/part2"
+	single_ham = "./data/test_ham.txt"
+	single_spam = "./data/test_spam.txt"
 
 	# Read data from training
 	final_words_train = count_words(training)
+	store_dict(final_words_train) #Store the feature matrix in data.txt
+	new_words = read_dict()
+
 	# final_words_train = remove_stop_words(counted_train)
 	train_x = extract_features(training, final_words_train)
+	store_matrix(train_x) # Store the feature matrix in matrix.txt
+
 
 	# Read data from testing
 	final_words_test = count_words(testing)
@@ -81,6 +87,22 @@ def main():
 	test_y = np.zeros(289)
 	test_y[0:240] = -1
 	test_y[241:288] = 1
+
+	#====================================================================
+	#============================Single Email============================
+	#====================================================================
+	
+	ham_vector = extract_single(single_ham)
+	predict1 = classify(train_x, train_y, 10, ham_vector)
+	print("Ham Predication:", predict1)
+	spam_vector = extract_single(single_spam)
+	predict2 = classify(train_x, train_y, 10, spam_vector)
+	print("Spam Predication:", predict2)
+
+	#====================================================================
+	#====================================================================
+	#====================================================================
+
 
 	k = 10
 	acc = runTest(test_x, test_y, train_x, train_y, k)

@@ -69,6 +69,7 @@ def models():
 	train_labels = np.zeros(289)
 	train_labels[241:288] = 1
 	train_matrix = extract_features(training2, dictionary)
+	store_matrix(train_matrix)
 
 
 	# ============================ TESTING ===========================
