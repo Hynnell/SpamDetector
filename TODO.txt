@@ -20,4 +20,6 @@ Data saving:
 Poster/Presentation:
 - Test with different amounts of data (train 10 emails, 100 emails, 1000, ...)
 - Graph different tests
-- Graph before and after normalization.
+
+- Add an extra graph
+- Make it less wordy, maybe bullet points.
