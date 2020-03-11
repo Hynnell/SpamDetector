@@ -1,97 +1,244 @@
-from collections import Counter
-import os
+#=============================Imports==============================#
+
 import numpy as np
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import LinearSVC
-from sklearn.metrics import confusion_matrix
-
 from extract import *
+from normalize import *
 
-'''
-TODO: 
-
-- Verify feature extraction works
-- Test on sample data (currently takes a very long time to run)
-- Refine text
-- Connect to GUI
-- Train the app so it doesnt need to be trained each time. 
-- Support single email submission
-'''
+#==================================================================#
 
 
-'''
-Notes about the confusion matrix: 
-In binary classification, the count of:
-true negatives is C[0,0] <- want this high
-false negatives is C[1,0]
-true positives is C[1,1] <- want this high
-false positives is C[0,1].
-'''
-def svcmodel(train_matrix, train_labels, test_matrix, test_labels):
-	#Initialize Model
-	model1 = LinearSVC()
-	model1.fit(train_matrix, train_labels)
-	result = model1.predict(test_matrix)
-	# Results for LinearSVC() model
-	c1 = confusion_matrix(test_labels,result)
-	acc = (c1[0,0] + c1[1,1])/len(test_labels)
-	return acc
 
-def nbmodel(train_matrix, train_labels, test_matrix, test_labels):
-	# Initialize model
-	model2 = MultinomialNB()
-	# Fitting the models for later use
-	model2.fit(train_matrix, train_labels)
-	result = model2.predict(test_matrix)
-	# Results for MultinomialNB() model
-	c2 = confusion_matrix(test_labels,result)
-	acc = (c2[0,0] + c2[1,1])/len(test_labels)
-	return acc
 
-def models():
-	# Test Email
+
+#=============================KNN Model============================#
+
+# Distance between instances x1 and x2
+def dist(x1, x2):
+	# TODO: YOUR CODE HERE
+	dist = np.linalg.norm(x1-x2)
+	dist = dist**2
+	return dist
+
+
+def classify(train_x, train_y, k, x):
 	'''
-	Lingspam_public data set
-		- 4 categories
-		- 10 parts each
-		- Each part has 48 spam and 242 ham
+	Use distance to determine k nearest x vectors, and then use sum on
+	corresponding y values. 
+
+	train_x : list of vectors
+	train_y : vector of classifications
+	x : vector we use to compare to other vectors within train_x
 	'''
 
-	# File paths
-	training2 = "./data/lingspam_public/bare/part1"
-	testing1 = './data/lingspam_public/bare/part1'
+	length_train = len(train_x)
+	dists = list()
+
+	for i in range(len(train_x)):
+		distance = dist(x, train_x[i])
+		dists.append(distance)
+
+	index_nearest = np.argpartition(dists, k)[:k]
+
+	classification_sum = 0
+	k_near = list()
+	for elem in index_nearest:
+		classification_sum += train_y[elem]
+
+	if classification_sum >= 0:
+		return 1
+	elif classification_sum < 0:
+		return -1
+
+
+# Function to compare results of classify with expected outcome to compute accuracy
+def runTest(test_x, test_y, train_x, train_y, k):
+	correct = 0
+	for (x,y) in zip(test_x, test_y):
+		if classify(train_x, train_y, k, x) == y: # Compare call to classify with test_y
+			correct += 1
+	acc = float(correct)/len(test_x)
+	return acc
+
+#==================================================================#
+
+
+
+
+
+
+#=========================Perceptron Model=========================#
+
+# Learn weights using the perceptron algorithm
+def train_perceptron(train_x, train_y, maxiter=100):
+  # Initialize weight vector and bias
+  '''
+  Check whether or not a point is correctly classified
+  If it is: 
+    Do nothing
+  If it is not: 
+    Figure out which weight (wi) is affected it most and adjust by accordingly.
+
+
+  '''
+  numvars = len(train_x[0])
+  numex = len(train_x)
+  w = np.array([0.0] * numvars)
+  b = 0.0
+
+  for m in range(maxiter):
+    for i in range(numex):
+      a = np.dot(w, train_x[i]) + b #Compute activation
+
+      a = a * train_y[i]
+      # print(a)
+      if a <= 0: # There is something wrong, we need to update. 
+
+        # Iterate through w, add the product of xj and yj
+        for j in range(numvars):
+          update = np.dot(train_y[i], train_x[i][j])
+          w[j] = w[j] + update
+
+        b = b + train_y[i] # Update the bias
+        
+      # Else: No update needed (correct prediction)
+
+  # print((w,b))
+  return (w,b)
+
+def predict_perceptron(model, x):
+  (w,b) = model
+
+  a = 0
+  for i in range(len(x)):
+    a += w[i]*x[i]
+
+  a += b
+  return a
+
+
+#==================================================================#
+
+
+
+
+
+
+#=================================Model============================#
+def model(model):
+
+	# File Paths for KNN
+	training = "./data/lingspam_public/bare/part1"
+	testing = "./data/lingspam_public/bare/part2"
+	# single_ham = "./data/test_ham.txt"
+	# single_spam = "./data/test_spam.txt"
+
+
+	# File Paths for Perceptron
+	training_p = "./data/lingspam_public/bare/part1"
+	testing_p = "./data/lingspam_public/bare/part2"
+
+
+	# Read data from training
+	final_words_train = count_words(training)
+	store_dict(final_words_train) #Store the feature matrix in data.txt
+	new_words = read_dict()
+
+	# final_words_train = remove_stop_words(counted_train)
+	train_x = extract_features(training, final_words_train)
+	store_matrix(train_x) # Store the feature matrix in matrix.txt
+
+	# Read data from testing
+	final_words_test = count_words(testing)
+	# final_words_test = remove_stop_words(counted_test)
+	test_x = extract_features(testing, final_words_test)
+
+	#Normalizing data here
+	# train_x, test_x = rangenorm(train_x, test_x)
+	# train_x, test_x = varnorm(train_x, test_x)
+	# train_x, test_x = exnorm(train_x, test_x)
+
+
+
+
+	if model == 1:
+
+
+		#====================================================================
+		#===============================KNN==================================
+		#====================================================================
+
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		train_y = np.zeros(289)
+		train_y[0:240] = -1
+		train_y[241:288] = 1
+
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		test_y = np.zeros(289)
+		test_y[0:240] = -1
+		test_y[241:288] = 1
+
+		k = 10
+		acc = runTest(test_x, test_y, train_x, train_y, k)
+		print("Accuracy:", acc)
+
+		#====================================================================
+		#====================================================================
+		#====================================================================
 	
-	# =========================== TRAINING ===========================
 
-	dictionary = count_words(training2) #Creates a dictionary containing frequencies of words.
+	elif model == 2:
+
+		#====================================================================
+		#============================Perceptron==============================
+		#====================================================================
+
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		train_y = np.zeros(289)
+		train_y[0:240] = -1
+		train_y[241:288] = 1
+
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		test_y = np.zeros(289)
+		test_y[0:240] = -1
+		test_y[241:288] = 1
+
+		(w,b) = train_perceptron(train_x, train_y, 100)
+
+		correct = 0
+		for (x,y) in zip(test_x, test_y):
+			activation = predict_perceptron( (w,b), x )
+			if activation * y > 0:
+				correct += 1
+		acc = float(correct)/len(test_y)
+		print("Accuracy: ",acc)
+
+		#====================================================================
+		#====================================================================
+		#====================================================================
+
+	else:
+		print("Not a valid model (1 for KNN, 2 for Perceptron).")
+
+
+
+
+	#====================================================================
+	#============================Single Email============================
+	#====================================================================
 	
-	# Creating our labels, 1 indicates spam, 0 indicates ham
-	train_labels = np.zeros(289)
-	train_labels[241:288] = 1
-	train_matrix = extract_features(training2, dictionary)
-	store_matrix(train_matrix)
+	# ham_vector = extract_single(single_ham)
+	# predict1 = classify(train_x, train_y, 10, ham_vector)
+	# print("Ham Predication:", predict1)
+	# spam_vector = extract_single(single_spam)
+	# predict2 = classify(train_x, train_y, 10, spam_vector)
+	# print("Spam Predication:", predict2)
+
+	#====================================================================
+	#====================================================================
+	#====================================================================
 
 
-	# ============================ TESTING ===========================
-	# Testing unseen data
-	test_matrix = extract_features(testing1, dictionary)
-	
-	# Creating our labels, 1 indicates spam, 0 indicates ham
-	test_labels = np.zeros(289)
-	test_labels[241:288] = 1
+#==================================================================#
 
-	c1_acc = svcmodel(train_matrix, train_labels, test_matrix, test_labels)
-	c2_acc = nbmodel(train_matrix, train_labels, test_matrix, test_labels) 
-
-	# ============================ RESULTS ===========================
-	print("Support Vector Classification Accuracy:", c1_acc)
-	print("Naive Bayes Accuracy:", c2_acc)
-
-def main():
-	models()
-
-if __name__ == '__main__':
-	main()
-
-
+model(2);
 
