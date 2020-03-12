@@ -123,30 +123,31 @@ def predict_perceptron(model, x):
 #=================================Model============================#
 def model(model):
 
+	# =================== File I/O ====================
+
 	# File Paths for KNN
 	training = "./data/lingspam_public/bare/part1"
 	testing = "./data/lingspam_public/bare/part2"
-	# single_ham = "./data/test_ham.txt"
-	# single_spam = "./data/test_spam.txt"
+
+	single_ham = "./data/test_ham.txt"
+	single_spam = "./data/test_spam.txt"
 
 
 	# File Paths for Perceptron
 	training_p = "./data/lingspam_public/bare/part1"
 	testing_p = "./data/lingspam_public/bare/part2"
 
+	# =================================================
+
+
+	# =============== Feature Extraction ==============
 
 	# Read data from training
 	final_words_train = count_words(training)
-	store_dict(final_words_train) #Store the feature matrix in data.txt
-	new_words = read_dict()
-
-	# final_words_train = remove_stop_words(counted_train)
 	train_x = extract_features(training, final_words_train)
-	store_matrix(train_x) # Store the feature matrix in matrix.txt
-
+	
 	# Read data from testing
 	final_words_test = count_words(testing)
-	# final_words_test = remove_stop_words(counted_test)
 	test_x = extract_features(testing, final_words_test)
 
 	#Normalizing data here
@@ -154,15 +155,63 @@ def model(model):
 	# train_x, test_x = varnorm(train_x, test_x)
 	# train_x, test_x = exnorm(train_x, test_x)
 
+	# =================================================
 
+
+	# ============================Single Email============================
+
+	
+	ham_vector = extract_single(single_ham)
+
+	print("Extracted ham_vector is:", ham_vector)
+	print("Length of ham_vector is:", len(ham_vector))
+	print("train_x[0] is:", train_x[0])
+	print("Length of train_x[0] is:", len(train_x[0]))
+
+	print("Testing single email")
+	count = 0
+	for i in range(len(ham_vector)):
+		if ham_vector[i] != train_x[0][i]:
+			count += 1
+			print("Error in extracting single email.")
+	print("Single email testing complete.")
+	print("Final count is:", count)
+
+	# predict1 = classify(train_x, train_y, 10, ham_vector)
+	# print("Ham Predication:", predict1)
+
+	# spam_vector = extract_single(single_spam)
+	# predict2 = classify(train_x, train_y, 10, spam_vector)
+	# print("Spam Predication:", predict2)
+
+	# ====================================================================
+
+
+	# ==================== Storage ====================
+
+	store_dict(final_words_train) #Store the feature matrix in data.txt
+	new_words = read_dict()
+
+	store_matrix(train_x) # Store the feature matrix in matrix.txt
+	new_matrix = read_matrix()
+
+	#Checking storage
+	print("Retrieving from storage.")
+
+	for i in range(len(new_matrix)):
+		for j in range(len(new_matrix[0])):
+			if train_x[i][j] != new_matrix[i][j]:
+				print("Not the same in storage.")
+
+	print("Done retrieving from storage.")
+
+	# =================================================
 
 
 	if model == 1:
 
 
-		#====================================================================
 		#===============================KNN==================================
-		#====================================================================
 
 		# Creating our labels, 1 indicates spam, -1 indicates ham
 		train_y = np.zeros(289)
@@ -175,19 +224,19 @@ def model(model):
 		test_y[241:288] = 1
 
 		k = 10
+		print("Starting KNN testing")
 		acc = runTest(test_x, test_y, train_x, train_y, k)
+		print("KNN testing done")
 		print("Accuracy:", acc)
 		return acc
+
 		#====================================================================
-		#====================================================================
-		#====================================================================
+
 	
 
 	elif model == 2:
 
-		#====================================================================
 		#============================Perceptron==============================
-		#====================================================================
 
 		# Creating our labels, 1 indicates spam, -1 indicates ham
 		train_y = np.zeros(289)
@@ -209,31 +258,33 @@ def model(model):
 		acc = float(correct)/len(test_y)
 		print("Accuracy: ",acc)
 		return acc
+
 		#====================================================================
-		#====================================================================
-		#====================================================================
+
 
 	else:
 		print("Not a valid model (1 for KNN, 2 for Perceptron).")
 
 
-
-
-	#====================================================================
-	#============================Single Email============================
-	#====================================================================
-	
-	# ham_vector = extract_single(single_ham)
-	# predict1 = classify(train_x, train_y, 10, ham_vector)
-	# print("Ham Predication:", predict1)
-	# spam_vector = extract_single(single_spam)
-	# predict2 = classify(train_x, train_y, 10, spam_vector)
-	# print("Spam Predication:", predict2)
-
-	#====================================================================
-	#====================================================================
-	#====================================================================
-
-
 #==================================================================#
+
+# For testing
+
+model(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
