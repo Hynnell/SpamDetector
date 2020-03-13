@@ -109,7 +109,11 @@ def extract_features(directory, dictionary):
 	dictionary: 300 most common words within the directory
 	toStore: used for storage, only store the matrix for training (no need to store for testing)
 	'''
-	files = [os.path.join(directory,file) for file in os.listdir(directory)]
+	files_list = [os.path.join(directory,file) for file in os.listdir(directory)]
+	files = sorted(files_list)
+
+	files = files[1:] # Get rid of .DS_Store file at the beginning (after sorted)
+	# print(files)
 
 	# Create the matrix to store the features
 	features_matrix = np.zeros((len(files), 3000))
@@ -119,6 +123,7 @@ def extract_features(directory, dictionary):
 	# traceback = [] #This is used to correlate words for the feedback
 
 	for emails in files:
+		# print(emails)
 		with open(emails, encoding="latin-1") as email:
 			for line in email:
 				words = line.split() # Create list of words on a line

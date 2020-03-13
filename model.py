@@ -83,7 +83,7 @@ def train_perceptron(train_x, train_y, maxiter=100):
   b = 0.0
 
   for m in range(maxiter):
-    for i in range(numex):
+    for i in range(numex-1):
       a = np.dot(w, train_x[i]) + b #Compute activation
 
       a = a * train_y[i]
@@ -160,29 +160,30 @@ def model(model):
 
 	# ============================Single Email============================
 
-	
+	test_dict = read_dict()
+
+	# print("Starting dictionary extraction")
+	# for i in range(len(test_dict)):
+	# 	if test_dict[i] != final_words_train[i][0]:
+	# 		print(test_dict[i], final_words_train[i][0])
+	# print("Dictionary extraction done")
+
 	ham_vector = extract_single(single_ham)
 
-	print("Extracted ham_vector is:", ham_vector)
-	print("Length of ham_vector is:", len(ham_vector))
-	print("train_x[0] is:", train_x[0])
-	print("Length of train_x[0] is:", len(train_x[0]))
+	# print("Extracted ham_vector is:", ham_vector)
+	# print("Length of ham_vector is:", len(ham_vector))
+	# print("train_x[0] is:", train_x[0])
+	# print("Length of train_x[0] is:", len(train_x[0]))
 
-	print("Testing single email")
-	count = 0
-	for i in range(len(ham_vector)):
-		if ham_vector[i] != train_x[0][i]:
-			count += 1
-			print("Error in extracting single email.")
-	print("Single email testing complete.")
-	print("Final count is:", count)
-
-	# predict1 = classify(train_x, train_y, 10, ham_vector)
-	# print("Ham Predication:", predict1)
-
-	# spam_vector = extract_single(single_spam)
-	# predict2 = classify(train_x, train_y, 10, spam_vector)
-	# print("Spam Predication:", predict2)
+	# print("Testing single email")
+	# count = 0
+	# for i in range(len(ham_vector)):
+	# 	# print(ham_vector[i], train_x[0][i])
+	# 	if ham_vector[i] != train_x[0][i]:
+	# 		count += 1
+	# 		print("Error^^^")
+	# print("Single email testing complete.")
+	# print("Final count is:", count)
 
 	# ====================================================================
 
@@ -196,14 +197,14 @@ def model(model):
 	new_matrix = read_matrix()
 
 	#Checking storage
-	print("Retrieving from storage.")
+	# print("Retrieving from storage.")
 
-	for i in range(len(new_matrix)):
-		for j in range(len(new_matrix[0])):
-			if train_x[i][j] != new_matrix[i][j]:
-				print("Not the same in storage.")
+	# for i in range(len(new_matrix)):
+	# 	for j in range(len(new_matrix[0])):
+	# 		if train_x[i][j] != new_matrix[i][j]:
+	# 			print("Not the same in storage.")
 
-	print("Done retrieving from storage.")
+	# print("Done retrieving from storage.")
 
 	# =================================================
 
@@ -223,11 +224,19 @@ def model(model):
 		test_y[0:240] = -1
 		test_y[241:288] = 1
 
-		k = 10
+		k = 6
 		print("Starting KNN testing")
 		acc = runTest(test_x, test_y, train_x, train_y, k)
 		print("KNN testing done")
 		print("Accuracy:", acc)
+
+		predict1 = classify(new_matrix, train_y, 1, ham_vector)
+		print("Ham Predication:", predict1)
+
+		spam_vector = extract_single(single_spam)
+		predict2 = classify(new_matrix, train_y, 1, spam_vector)
+		print("Spam Predication:", predict2)
+
 		return acc
 
 		#====================================================================
