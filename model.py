@@ -3,7 +3,7 @@
 import numpy as np
 from extract import *
 from normalize import *
-
+# import ui as u
 #==================================================================#
 
 
@@ -121,21 +121,25 @@ def predict_perceptron(model, x):
 
 
 #=================================Model============================#
-def model(model):
+# Type of model (1 = KNN, 2 = Perceptron, directory of training, directory of testing,
+# Total numbers of files, total numbers of ham, single entry to be scanned
+def model(model, default, training, testing, tot, ham, single):
 
 	# =================== File I/O ====================
 
-	# File Paths for KNN
-	training = "./data/lingspam_public/bare/part1"
-	testing = "./data/lingspam_public/bare/part2"
+	# File Paths for default datasets
+	if default:
+		training = "./data/lingspam_public/bare/part1"
+		testing = "./data/lingspam_public/bare/part2"
 
+	# For testing purposes
 	single_ham = "./data/test_ham.txt"
 	single_spam = "./data/test_spam.txt"
 
 
-	# File Paths for Perceptron
-	training_p = "./data/lingspam_public/bare/part1"
-	testing_p = "./data/lingspam_public/bare/part2"
+	# # File Paths for Perceptron
+	# training_p = "./data/lingspam_public/bare/part1"
+	# testing_p = "./data/lingspam_public/bare/part2"
 
 	# =================================================
 
@@ -207,13 +211,7 @@ def model(model):
 	# print("Done retrieving from storage.")
 
 	# =================================================
-
-
-	if model == 1:
-
-
-		#===============================KNN==================================
-
+	if default:
 		# Creating our labels, 1 indicates spam, -1 indicates ham
 		train_y = np.zeros(289)
 		train_y[0:240] = -1
@@ -223,6 +221,22 @@ def model(model):
 		test_y = np.zeros(289)
 		test_y[0:240] = -1
 		test_y[241:288] = 1
+	else:
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		train_y = np.zeros(tot)
+		train_y[0:(ham-1)] = -1
+		train_y[ham:(tot-1)] = 1
+
+		# Creating our labels, 1 indicates spam, -1 indicates ham
+		test_y = np.zeros(tot)
+		test_y[0:(ham-1)] = -1
+		test_y[ham:(tot-1)] = 1
+
+	if model == 1:
+
+
+		#===============================KNN==================================
+
 
 		k = 6
 		print("Starting KNN testing")
@@ -231,11 +245,11 @@ def model(model):
 		print("Accuracy:", acc)
 
 		predict1 = classify(new_matrix, train_y, 1, ham_vector)
-		print("Ham Predication:", predict1)
+		# print("Ham Predication:", predict1)
 
 		spam_vector = extract_single(single_spam)
 		predict2 = classify(new_matrix, train_y, 1, spam_vector)
-		print("Spam Predication:", predict2)
+		# print("Spam Predication:", predict2)
 
 		return acc
 
@@ -247,15 +261,15 @@ def model(model):
 
 		#============================Perceptron==============================
 
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		train_y = np.zeros(289)
-		train_y[0:240] = -1
-		train_y[241:288] = 1
+		# # Creating our labels, 1 indicates spam, -1 indicates ham
+		# train_y = np.zeros(289)
+		# train_y[0:240] = -1
+		# train_y[241:288] = 1
 
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		test_y = np.zeros(289)
-		test_y[0:240] = -1
-		test_y[241:288] = 1
+		# # Creating our labels, 1 indicates spam, -1 indicates ham
+		# test_y = np.zeros(289)
+		# test_y[0:240] = -1
+		# test_y[241:288] = 1
 
 		(w,b) = train_perceptron(train_x, train_y, 100)
 
@@ -265,7 +279,7 @@ def model(model):
 			if activation * y > 0:
 				correct += 1
 		acc = float(correct)/len(test_y)
-		print("Accuracy: ",acc)
+		# print("Accuracy: ",acc)
 		return acc
 
 		#====================================================================
@@ -274,12 +288,14 @@ def model(model):
 	else:
 		print("Not a valid model (1 for KNN, 2 for Perceptron).")
 
+	#NOTE THIS ONLY RETURNS ONE PREDICTION
+	return predict1
 
 #==================================================================#
 
 # For testing
 
-model(1)
+# model(1, 1, "", "", 0, 0, 0)
 
 
 

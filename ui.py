@@ -18,13 +18,16 @@ small_title_font = ("Helvetica", 25, "bold italic")
 title_font = ("Helvetica", 40, "bold italic")
 info_font = ("Helvetica", 14, "italic")
 #Single message path, training folder path, testing folder path
-filepath = None
-tr = None
-te = None
+filepath = ""
+tr = ""
+te = ""
 #Changed to 0 when user enters their own dataset
 default = 1
 # total, ham, spam files given by the user
-global tot, ham, spam
+tot = 0
+ham = 0
+spam = 0
+# global tot, ham, spam
 #List of algorithms the user can choose from
 algorithms = [
 	"Nearest Neighbor", 
@@ -35,6 +38,8 @@ algorithms = [
 def input_file():
 	global filepath
 	filepath = filedialog.askopenfilename(initialdir="./..", title="Select File")
+	# label = Label(top, text="Enter dataset information:", bg='cadet blue', fg = "white", font = small_title_font)
+	# label.place(relx = .5, rely = .15, anchor = CENTER)
 
 def testfolderfinder():
 	global te
@@ -225,25 +230,27 @@ class StartPage(Frame):
 
 	def loading(self, q):
 		if q:
-			load = Label(self, text="Loading Please Wait...", bg='lightblue2', font = ("Helvetica", 20, "bold"))
-			load.place(relx = .8, rely = 1.0, anchor = SW)
+			load = Label(self, text="Loading Please Wait...", bg='lightblue2', font = ("Helvetica", 15, "bold"))
+			load.place(relx = .8, rely = 1.0, anchor = SE)
 		else:
-			load = Label(self, text="Loading Please Wait...", bg='cadet blue', font = ("Helvetica", 20, "bold"))
-			load.place(relx = .8, rely = 1.0, anchor = SW)
+			load = Label(self, text="Loading Please Wait...", bg='cadet blue', font = ("Helvetica", 15, "bold"))
+			load.place(relx = .8, rely = 1.0, anchor = SE)
 
 	def scan(self, parent, controller):
 		global filepath
 		self.loading(1)
 		#Calls Train nearest neighbor
 		if opt.get() == algorithms[0] or opt.get() == algorithms[2]:
-			#vec = m.extract_single(filepath)
-			#tr_y = k.trainingy(tot, spam, ham)
-			#pred = m.classify(tr, tr_y, 10, vec)
-			#print(pred)
-			pass
+			# print("Tot: ", tot, "  Ham: ", ham)
+			res = m.model(1, default, tr, te, tot, ham, filepath)
+			print("RES: ", res)
 		#Calls Train Perceptron
 		if opt.get() == algorithms[1] or opt.get() == algorithms[2]:
-			pass
+			res = m.model(2, default, tr, te, tot, ham, filepath)
+			print(res)
+		#Shows the results
+		root.pages[ResultPage].load(parent, controller)
+		controller.show_frame(ResultPage)
 
 		# load2 = Label(self, text="Results:", bg='cadet blue')
 	    # load2.place(relx = .45, rely = .5)
@@ -292,7 +299,7 @@ class DatasetPage(Frame):
 		b.place(relx=0.5, rely=.5, anchor=W)
 
 		#Asks for total number of files
-		#--- stored in total---
+		#--- stored in totalent---
 		label = Label(self, text="Number of Total files: ", bg='cadet blue', fg = "black", font = info_font)
 		label.place(relx = .2, rely = .6, anchor = W)
 		totalent = Entry(self)
@@ -337,6 +344,8 @@ class DatasetPage(Frame):
 
 		'''
 		NEED TO FIX THIS!!!
+		Need to make sure spam + ham = tot
+		need to make sure more than 0.
 		'''
 		if not totalent.get() or  not hament.get() or not spament.get():
 			print("not filled out")
@@ -358,9 +367,9 @@ class DatasetPage(Frame):
 
 		fixlbl3 = Label(self, text='*Please enter training/testing data.', bg="cadet blue", fg="cadet blue", font=info_font)
 		default = 0
-		tot = totalent
-		ham = hament
-		spam = spament
+		tot = int(totalent)
+		ham = int(hament)
+		spam = int(spament)
 		self.popup(parent, controller)
 
 	# Popup window for user to know their data has been saved.
@@ -388,7 +397,7 @@ class ResultPage(Frame):
 		fr1 = Frame(self, width = 570, height = 70, bg = 'deepskyblue4')
 		fr1.place(relx=0.0, rely=0.0, anchor=NW)
 
-		label = Label(fr1, text="Enter dataset information:", bg='deepskyblue4', fg = "white", font = title_font)
+		label = Label(fr1, text="Results:", bg='deepskyblue4', fg = "white", font = title_font)
 		label.place(relx = 0.5, rely = .5, anchor = CENTER)
 
 		fr2 = Frame(self, width = 700, height = 5, bg = 'lightblue2')
@@ -396,6 +405,10 @@ class ResultPage(Frame):
 
 		fr3 = Frame(self, width = 700, height = 60, bg = 'lightblue2')
 		fr3.place(relx=0.5, rely=1.0, anchor=CENTER)
+
+		label = Label(self, text="Average Model Accuracy: ", bg='cadet blue', fg = "black", font = info_font)
+		label.place(relx = .2, rely = .5, anchor = W)
+
 
 	def load(self, parent, controller):
 		#Return
