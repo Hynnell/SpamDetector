@@ -135,7 +135,6 @@ def predict_single(model, default, single):
 
 	return prediction
 
-
 #==================================================================#
 
 #=================================Model============================#
@@ -171,17 +170,6 @@ def model(model, default, training, testing, tot, ham):
 	test_y = np.zeros(tot)
 	test_y[0:(ham-1)] = -1
 	test_y[ham:(tot-1)] = 1
-
-
-	# =================================================
-
-	# #SINGLE STUFFF
-	
-	# ham_vector = extract_single(single)
-	# storage_matrix = read_matrix()
-
-
-	# ====================================================================
 
 
 	# ==================== Storage =============== =====
@@ -228,18 +216,6 @@ def model(model, default, training, testing, tot, ham):
 		return -1,-1
 
 #==================================================================#
-
-# For testing
-
-# acc = model(2, 1, "", "", 0, 0, "./data/test_spam.txt")
-# print("Accuracy: ", acc)
-
-# acc = model(2, 1, "./data/lingspam_public/bare/part7", "./data/lingspam_public/bare/part10", 289, 241)
-# print("Accuracy: ", acc)
-
-# predict = predict_single(1, 1, "./data/test_spam.txt")
-# print("Perceptron prediction: ", predict)
-
 
 
 
