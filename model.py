@@ -125,24 +125,17 @@ def predict_perceptron(model, x):
 # Total numbers of files, total numbers of ham, single entry to be scanned
 def model(model, default, training, testing, tot, ham, single):
 	# =================== File I/O ====================
-
 	# File Paths for default datasets
 	if default:
 		training = "./data/lingspam_public/bare/part1"
 		testing = "./data/lingspam_public/bare/part2"
-
-	single = "./data/test_spam.txt"
-
-	# # For testing purposes
-	# single_ham = "./data/test_ham.txt"
-	# single_spam = "./data/test_spam.txt"
 
 	# =================================================
 
 
 	# =============== Feature Extraction ==============
 	# if not default:
-	
+
 	# Read data from training
 	final_words_train = count_words(training)
 	train_x = extract_features(training, final_words_train)
@@ -237,10 +230,10 @@ def model(model, default, training, testing, tot, ham, single):
 
 		#default accuracy from previous testing 
 		acc = 0.8263888888888888
-		k = 6
+		k = 15
 		# print("Starting KNN testing")
 
-		# acc = runTest(test_x, test_y, train_x, train_y, k)
+		acc = runTest(test_x, test_y, train_x, train_y, k)
 
 
 
@@ -249,7 +242,7 @@ def model(model, default, training, testing, tot, ham, single):
 		# print("Accuracy:", acc)
 
 		predict1 = classify(new_matrix, train_y, 1, ham_vector)
-		# print("Ham Predication:", predict1)
+		print("Ham Predication:", predict1)
 
 		# spam_vector = extract_single(single_spam)
 		# predict2 = classify(new_matrix, train_y, 1, spam_vector)
@@ -265,15 +258,6 @@ def model(model, default, training, testing, tot, ham, single):
 
 		#============================Perceptron==============================
 
-		# # Creating our labels, 1 indicates spam, -1 indicates ham
-		# train_y = np.zeros(289)
-		# train_y[0:240] = -1
-		# train_y[241:288] = 1
-
-		# # Creating our labels, 1 indicates spam, -1 indicates ham
-		# test_y = np.zeros(289)
-		# test_y[0:240] = -1
-		# test_y[241:288] = 1
 
 		(w,b) = train_perceptron(train_x, train_y, 100)
 
@@ -291,11 +275,7 @@ def model(model, default, training, testing, tot, ham, single):
 
 	else:
 		print("Not a valid model (1 for KNN, 2 for Perceptron).")
-
-	# #NOTE THIS ONLY RETURNS ONE PREDICTION
-	# print("PREDICT1: ", predict1)
-	# print("PREDICT1: ", acc)
-	# return predict1
+		return -1,-1
 
 #==================================================================#
 

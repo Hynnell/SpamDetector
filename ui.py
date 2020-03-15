@@ -41,40 +41,24 @@ algorithms = [
 	"Both"
 ]
 '''======================================Functions=========================================='''  
+#finds the input message that the user wants to determine if spam or ham
 def input_file():
 	global filepath
 	filepath = filedialog.askopenfilename(initialdir="./..", title="Select File")
 	# label = Label(top, text="Enter dataset information:", bg='cadet blue', fg = "white", font = small_title_font)
 	# label.place(relx = .5, rely = .15, anchor = CENTER)
 
+#Finds the testing folder
 def testfolderfinder():
 	global te
 	te = filedialog.askdirectory(initialdir="./..", title="Select Folder")
 
+#Finds the trainging folder
 def trainfolderfinder():
 	global tr
 	tr = filedialog.askdirectory(initialdir="./..", title="Select Folder")
 
-def dataset():
-	top = Toplevel()
-	top.geometry('300x300')
-	top.resizable(False, False)
-	top.title("DataSet Information")
-	top.config(bg="cadet blue")
-
-	label = Label(top, text="Enter dataset information:", bg='cadet blue', fg = "white", font = small_title_font)
-	label.place(relx = .5, rely = .15, anchor = CENTER)
-
-	label = Label(top, text="Structure of dataset: Ham files first, the Spam files follows.", bg='cadet blue', fg = "white", 
-		font = info_font, wraplength = 300, justify = CENTER )
-	label.place(relx = .5, rely = .4, anchor = CENTER)
-
-	label = Label(top, text="Number of total files: ", bg='cadet blue', fg = "white", font = info_font)
-	label.place(relx = .5, rely = .5, anchor = CENTER)
-
-	label = Label(top, text="Structure of dataset: Ham files first, the Spam files follows.", bg='cadet blue', fg = "white", font = info_font)
-	label.place(relx = .5, rely = .6, anchor = CENTER)
-
+# Function thats exits out of a certain window
 def quitWindow(win):
     win.destroy()
 
@@ -321,7 +305,7 @@ class DatasetPage(Frame):
 
 	#Errors checks first then saves if passed tests.
 	def save(self, parent, controller):
-		global totalent, hament, spament
+		global totalent, hament, spament, default, ham, tot
 		
 		#Check to make sure entries are filled out
 		if not totalent.get() or  not hament.get() or not spament.get():
@@ -368,7 +352,6 @@ class DatasetPage(Frame):
 		ham = int(hament.get())
 		spam = int(spament.get())
 
-		print("here!, tot: ", tot, "\nHam: ", ham)
 		#Tells user their information was saved.
 		self.popup(parent, controller)
 

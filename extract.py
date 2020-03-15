@@ -68,7 +68,7 @@ def read_matrix():
 	for line in file: # Determine how many emails (rows of matrix) there are
 		count += 1
 
-	print(count)
+	# print(count)
 	features_matrix = np.zeros((count, 3000))
 
 	with open('storage/matrix.txt', 'r') as file:

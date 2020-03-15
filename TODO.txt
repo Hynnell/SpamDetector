@@ -4,7 +4,8 @@ GUI:
 - Button for testing a single email
 
 - Visualize information such as most common spam words and how many emails were spam.
-
+- select folder
+- inbox
 
 
 Models:
@@ -23,3 +24,5 @@ Poster/Presentation:
 
 - Add an extra graph
 - Make it less wordy, maybe bullet points.
+
+
