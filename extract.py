@@ -36,9 +36,14 @@ def count_words(directory):
 #=========================== DATA STORAGE ===========================
 #====================================================================
 
-def store_matrix(feature_matrix):
+def store_matrix(feature_matrix, default):
 	# Stores the feature_matrix to the data.txt file
-	with open('storage/matrix.txt', 'w') as file:
+	#Checks which file to store in
+	fl = 'storage/matrix.txt'
+	if not default:
+		fl = 'storage/usrmatrix.txt'
+
+	with open(fl, 'w') as file:
 		for row in feature_matrix:
 			length = len(row)
 			for i in range(length):
@@ -49,8 +54,13 @@ def store_matrix(feature_matrix):
 					file.write(str(row[i]))
 			file.write("\n")
 
-def store_dict(dictionary): # Stores the dictionary inside of data.txt in storage
-	with open('storage/data.txt', 'w') as file:
+def store_dict(dictionary, default): # Stores the dictionary inside of data.txt in storage
+	#checks which file to store in
+	fl = 'storage/data.txt'
+	if not default:
+		fl = 'storage/usrdata.txt'
+
+	with open(fl, 'w') as file:
 		i = 0
 		for word,freq in dictionary:
 			i += 1
@@ -61,17 +71,41 @@ def store_dict(dictionary): # Stores the dictionary inside of data.txt in storag
 			file.write(str(word))
 			file.write("\n")
 
-def read_matrix():
+def store_w(w, default): # Stores the dictionary inside of data.txt in storage
+	#checks which file to store in
+	fl = 'storage/weight.txt'
+	if not default:
+		fl = 'storage/usrweight.txt'
+	# f = open(fl,'w') #open a file in write mode
+	np.savetxt(fl, w)
+	# f.close() #close the file
+
+def store_b(b, default): # Stores the dictionary inside of data.txt in storage
+	#checks which file to store in
+	fl = 'storage/bias.txt'
+	if not default:
+		fl = 'storage/usrbias.txt'
+	f = open(fl,'w') #open a file in write mode
+	f.write(str(b)) #str(b)
+	# np.savetxt(fl, dictionary[1])
+	f.close() #close the file
+
+def read_matrix(default):
 	# Reads the feature_matrix from the data.txt file
 	count = 0
-	file = open('storage/matrix.txt', 'r')
+	#checks which file to read in
+	fl = 'storage/matrix.txt'
+	if not default:
+		fl = 'storage/usrmatrix.txt'
+
+	file = open(fl, 'r')
 	for line in file: # Determine how many emails (rows of matrix) there are
 		count += 1
 
 	# print(count)
 	features_matrix = np.zeros((count, 3000))
 
-	with open('storage/matrix.txt', 'r') as file:
+	with open(fl, 'r') as file:
 		count = 0
 		for row in file:
 			i = 0
@@ -84,9 +118,13 @@ def read_matrix():
 
 	return features_matrix
 
+def read_dict(default):
+	#Checks which .txt to open
+	fl = 'storage/data.txt'
+	if not default:
+		fl = 'storage/usrdata.txt'
 
-def read_dict():
-	with open('storage/data.txt', 'r') as file:
+	with open(fl, 'r') as file:
 		words = ['' for i in range(3000)]
 		i = 0
 		for line in file:
@@ -98,6 +136,24 @@ def read_dict():
 			i += 1
 
 	return words
+
+ # Reads the weights inside of (usr)weight.txt in storage
+def read_wb(default):
+	#checks which file to store in
+	fl = 'storage/weight.txt'
+	fl2 = 'storage/bias.txt'
+	if not default:
+		fl = 'storage/usrweight.txt'
+		fl2 = 'storage/usrbias.txt'
+
+	w = np.loadtxt(fl, float)
+	f = open(fl2,'r') #open a file in read mode
+	b = f.readline()
+	b = float(b)
+	f.close() #close the file
+	# f.close() #close the file
+	return (w,b)
+
 
 #====================================================================
 #==========================FEATURE MATRIX============================
@@ -141,11 +197,11 @@ def extract_features(directory, dictionary):
 	return features_matrix
 
 # Function to test a single email against a feature matrix
-def extract_single(file):
+def extract_single(file, default):
 
 	# Create the matrix to store the features
 	# feature_matrix = read_matrix()
-	dictionary = read_dict()
+	dictionary = read_dict(default)
 	
 	'''
 	Vector specific to the email

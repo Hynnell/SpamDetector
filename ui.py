@@ -28,12 +28,14 @@ te = ""
 #Changed to 0 when user enters their own dataset
 default = 1
 
-# total, ham, spam files given by the user
+#Variables that saves the accuracy of any tests that are ran
+p = 0.0
+k = 0.0 
+
+# total, ham files given by the user
 tot = 0
 ham = 0
-spam = 0
 
-# global tot, ham, spam
 #List of algorithms the user can choose from
 algorithms = [
 	"Nearest Neighbor", 
@@ -72,7 +74,7 @@ class start(Tk):
 		container = Frame(self, height=350, width=550, bg="cadet blue")
 		container.pack(side="top", fill="both", expand=True)
 		self.pages = {}
-		for page in (MainMenu, AboutPage, StartPage, DatasetPage, ResultPage): #InformationPage
+		for page in (MainMenu, AboutPage, StartPage, DatasetPage, ResultPage, DSResultPage):
 			frame = page(container, self)
 			self.pages[page] = frame
 			frame.place(relx=0.0, rely=0.0, height=350, width=550)
@@ -194,8 +196,6 @@ class StartPage(Frame):
 		file.place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
 		#Button for training data
-		# load = Label(self, text="Please Wait", bg='lightblue2', font = ("Helvetica", 15, "bold"))
-		# load.place(relx = .8, rely = 1.0, anchor = SE)
 		detect_spam = Button(self, padx=30, width=5, text="Train!", highlightbackground='lightblue2', command = lambda: self.errorcheck(parent, controller))
 		detect_spam.place(relx = 1.0, rely = 1.0, anchor = SE)
 
@@ -216,22 +216,28 @@ class StartPage(Frame):
 			self.scan(parent, controller)
 
 	def scan(self, parent, controller):
-		global filepath, opt
-		# self.loading(1)
+		global filepath, opt, k, p
 		#Initialize results values and accuracies
 		kres = 0
 		pres = 0
 		kacc = -1
 		pacc = -1
+
 		#Calls Train nearest neighbor
 		if opt.get() == algorithms[0] or opt.get() == algorithms[2]:
-			# print("Tot: ", tot, "  Ham: ", ham)
-			kacc, kres = m.model(1, default, tr, te, tot, ham, filepath)
+			kres = m.predict_single(1, default, filepath)
+			#Sets accuracy of default datasets that have been trained
+			if default:
+				kacc = 0.8241379310344827
+			else:
+				kacc = k
 		#Calls Train Perceptron
 		if opt.get() == algorithms[1] or opt.get() == algorithms[2]:
-			pacc, pres = m.model(2, default, tr, te, tot, ham, filepath)
-			print("PRES: ", pres)
-
+			pres = m.predict_single(2, default, filepath)
+			if default:
+				pacc = 0.8200692041522492
+			else:
+				pacc = p
 		#Resets opt in preparation for another entry
 		opt.set("Choose..")
 		#Shows the results
@@ -242,7 +248,7 @@ class StartPage(Frame):
 class DatasetPage(Frame):
 	def __init__(self, parent, controller):
 		Frame.__init__(self, parent)
-		global totalent, hament, spament, folder
+		global totalent, hament, opt2, folder
 		#Label for Title and frame
 		fr1 = Frame(self, width = 570, height = 70, bg = 'deepskyblue4')
 		fr1.place(relx=0.0, rely=0.0, anchor=NW)
@@ -287,28 +293,34 @@ class DatasetPage(Frame):
 		hament = Entry(self)
 		hament.place(relx=0.5, rely=0.7, anchor=W)
 
-		#Asks for total number of spam files
-		#---stored in spament---
-		label = Label(self, text="Number of Spam files:", bg='cadet blue', fg = "black", font = info_font)
+		#Saves current drop down option as opt
+		opt2 = StringVar() 
+		opt2.set("Choose..")
+		#Drop down menu to select a certain algorithm
+		label = Label(self, text="Choose a model: ", bg='cadet blue', fg = "black", font = info_font)
 		label.place(relx = .2, rely = .8, anchor = W)
-		spament = Entry(self)
-		spament.place(relx=0.5, rely=0.8, anchor=W)
+		ddb = OptionMenu(self, opt2, *algorithms)
+		ddb.config(bg = 'cadet blue', padx = 45)
+		ddb["menu"].config(bg = 'cadet blue')
+		ddb.place(relx = .49, rely = .8, anchor = W)
 
+		label = Label(self, text="This will take a couple of minutes. ->", bg='lightblue2', fg = "black", font = info_font)
+		label.place(relx = .9, rely = .99, anchor = SE)
+		
 		#Back button goes back to main menu without saving any of the data
 		b1 = Button(self, text="Back", highlightbackground="lightblue2", padx=10,
 								command=lambda: controller.show_frame(MainMenu))
 		b1.place(relx=0.0, rely=1.0, anchor=SW)
 		#Save button first error checks, then saves dataset information.
-		b2 = Button(self, text="Save", highlightbackground="lightblue2", padx=10,
+		b2 = Button(self, text="Train", highlightbackground="lightblue2", padx=10,
 								command=lambda: self.save(parent, controller))
 		b2.place(relx=1.0, rely=1.0, anchor=SE)
 
 	#Errors checks first then saves if passed tests.
 	def save(self, parent, controller):
-		global totalent, hament, spament, default, ham, tot
-		
+		global totalent, hament, opt2, default, ham, tot
 		#Check to make sure entries are filled out
-		if not totalent.get() or  not hament.get() or not spament.get():
+		if not totalent.get() or  not hament.get() or (opt2.get() == 'Choose..'):
 			#error label displayed to user
 			errorlbl2 = Label(self, text='*Please fill out all sections.', bg="cadet blue", fg="red4", font=info_font)
 			errorlbl2.place(relx=.5, rely = .88, anchor = CENTER)
@@ -318,7 +330,7 @@ class DatasetPage(Frame):
 		fixlbl2.place(relx=.5, rely = .88, anchor = CENTER)
 
 		#Check to make sure file entries are digits.
-		if not totalent.get().isdigit() or not spament.get().isdigit() or not hament.get().isdigit():
+		if not totalent.get().isdigit() or not hament.get().isdigit():
 			errorlbl = Label(self, text='           *Please enter only digits.       ', bg="cadet blue", fg="red4", font=info_font)
 			errorlbl.place(relx = .5, rely = .88, anchor = CENTER)
 			return
@@ -327,13 +339,13 @@ class DatasetPage(Frame):
 
 		#Make sure values are postive and greater than 0
 		#Also checks to make sure ham + spam = total
-		if (int(totalent.get()) <= 0) or (int(spament.get()) <= 0) or (int(hament.get()) <= 0) or (int(hament.get()) + int(spament.get())) != int(totalent.get()):
-			errorlbl = Label(self, text='           *Invalid Number of File Information.       ', bg="cadet blue", fg="red4", font=info_font)
+		if (int(totalent.get()) <= 0) or (int(hament.get()) <= 0) or (int(hament.get()) == int(totalent.get())):
+			errorlbl = Label(self, text='           *Invalid File Information.       ', bg="cadet blue", fg="red4", font=info_font)
 			errorlbl.place(relx = .5, rely = .88, anchor = CENTER)
 			return
 
 		#Fix label that replaces error label
-		fixlbl = Label(self, text='       *Invalid Number of File Information.       ', bg="cadet blue", fg="cadet blue", font=info_font)
+		fixlbl = Label(self, text='       *Invalid File Information.       ', bg="cadet blue", fg="cadet blue", font=info_font)
 		fixlbl.place(relx = .5, rely = .88, anchor = CENTER)
 
 		#Checks to make sure training and testing data has been filled
@@ -350,29 +362,144 @@ class DatasetPage(Frame):
 		default = 0
 		tot = int(totalent.get())
 		ham = int(hament.get())
-		spam = int(spament.get())
 
 		#Tells user their information was saved.
-		self.popup(parent, controller)
+		# self.popup(parent, controller)
+
+		#Routes user to the result data that will give the accuracy of the model
+		root.pages[DSResultPage].load(parent, controller, opt2)
+		controller.show_frame(DSResultPage)
+
 
 	# Popup window for user to know their data has been saved.
 	def popup(self, parent, controller):
+		global filepath, opt2
+		pacc = "Model Not Trained"
+		kacc = "Model Not Trained"
+		# #Calls Train nearest neighbor
+		# if opt2.get() == algorithms[0] or opt2.get() == algorithms[2]:
+		# 	print("default: ", default, "\nTr: ", tr, "\ntot: ", tot)
+		# 	kacc = m.model(1, default, tr, te, tot, ham)
+		# #Calls Train Perceptron
+		# if opt2.get() == algorithms[1] or opt2.get() == algorithms[2]:
+		# 	pacc = m.model(2, default, tr, te, tot, ham)
+
+		#Resets opt in preparation for another entry
+		opt2.set("Choose..")
+
 		top = Toplevel()
 		top.geometry('320x170')
 		top.resizable(False, False)
-		top.title("Save Completed")
+		top.title("Dataset Training Completed")
 		top.config(bg='deepskyblue4')
 
-		label = Label(top, text="Dataset Information\nSaved!", bg='deepskyblue4', fg = "white", font = small_title_font)
+		label = Label(top, text="Dataset Information:", bg='deepskyblue4', fg = "white", font = small_title_font)
 		label.place(relx = .5, rely = .1, anchor = N)
 
+		label = Label(top, text="Nearest Neighbor Accuracy (%): ", bg='cadet blue', fg = "grey19", font = small_title_font)
+		label.place(relx = .05, rely = .4, anchor = W)
+
+		label = Label(top, text="Perceptron Accuracy (%): ", bg='cadet blue', fg = "grey19", font = small_title_font)
+		label.place(relx = .05, rely = .6, anchor = W)
+
+		label = Label(top, text= kacc, bg='cadet blue', fg = "white", font = button_font)
+		label.place(relx = .57, rely = .5, anchor = W)
+		label = Label(top, text= pacc, bg='cadet blue', fg = "white", font = button_font)
+		label.place(relx = .57, rely = .7, anchor = W)
+
 		#Bottom part of screen
-		fr1 = Frame(top, width = 400, height = 70, bg = 'lightblue2')
+		fr1 = Frame(top, width = 400, height = 40, bg = 'lightblue2')
 		fr1.place(relx=0.5, rely=1.0, anchor=S)
 		b1 = Button(fr1, text="Go Back", highlightbackground="lightblue2", padx=50, command=lambda: [quitWindow(top), controller.show_frame(MainMenu)])
 		b1.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-# This is where the results of the tests can be seen by the user.
+# This is where the results of the training can be seen by the user.
+class DSResultPage(Frame):
+	def __init__(self, parent, controller):
+		Frame.__init__(self, parent)
+		#Label for Title
+		fr1 = Frame(self, width = 570, height = 70, bg = 'deepskyblue4')
+		fr1.place(relx=0.0, rely=0.0, anchor=NW)
+
+		label = Label(fr1, text="Training Results:", bg='deepskyblue4', fg = "white", font = title_font)
+		label.place(relx = 0.5, rely = .5, anchor = CENTER)
+
+		fr2 = Frame(self, width = 700, height = 5, bg = 'lightblue2')
+		fr2.place(relx=0.5, rely=0.2, anchor=CENTER)
+
+		label = Label(self, text="Training Dataset: ", bg='cadet blue', fg = "grey19", font = result_font)
+		label.place(relx = .05, rely = .3, anchor = W)
+
+		label = Label(self, text="Testing Dataset: ", bg='cadet blue', fg = "grey19", font = result_font)
+		label.place(relx = .05, rely = .4, anchor = W)
+
+		label = Label(self, text="Nearest Neighbor Accuracy (%): ", bg='cadet blue', fg = "grey19", font = result_font)
+		label.place(relx = .05, rely = .5, anchor = W)
+
+		label = Label(self, text="Perceptron Accuracy (%): ", bg='cadet blue', fg = "grey19", font = result_font)
+		label.place(relx = .05, rely = .6, anchor = W)
+
+		#Bottom line background
+		fr3 = Frame(self, width = 700, height = 60, bg = 'lightblue2')
+		fr3.place(relx=0.5, rely=1.0, anchor=CENTER)
+
+		b0 = Button(self, text="Test Single Entry", highlightbackground="lightblue2", padx=10,
+								command=lambda: controller.show_frame(StartPage))
+		b0.place(relx=0.0, rely=1.0, anchor=SW)
+		b0 = Button(self, text="Main Menu", highlightbackground="lightblue2", padx=10,
+								command=lambda: controller.show_frame(MainMenu))
+		b0.place(relx=1.0, rely=1.0, anchor=SE)
+
+	def load(self, parent, controller, option):
+		global p, k
+		#Initialize result of message
+		pacc = "Model Not Trained"
+		kacc = "Model Not Trained"
+
+		# Trains nearest neighbor
+		if option.get() == algorithms[0] or option.get() == algorithms[2]:
+			kacc = m.model(1, default, tr, te, tot, ham)
+			k = kacc
+			kacc = kacc * 100
+		# Trains Perceptron
+		if option.get() == algorithms[1] or option.get() == algorithms[2]:
+			pacc = m.model(2, default, tr, te, tot, ham)
+			p = pacc
+			pacc = pacc * 100
+
+		#Resets opt in preparation for another entry
+		option.set("Choose..")
+
+		temp = tr.split("/")
+		train = temp[len(temp)-1]
+		temp2 = te.split("/")
+		test = temp2[len(temp2)-1]
+
+		#Enters name of training dataset folder
+		label = Label(self, text="					", bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .37, rely = .3, anchor = W)
+		label = Label(self, text=train, bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .37, rely = .3, anchor = W)
+
+		#Enters the name of the testing dataset
+		label = Label(self, text="					", bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .35, rely = .4, anchor = W)
+		label = Label(self, text=test, bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .35, rely = .4, anchor = W)
+
+		# Enters accuracy for nearest neighbor
+		label = Label(self, text="				", bg='cadet blue',font = result_font)
+		label.place(relx = .62, rely = .5, anchor = W)
+		label = Label(self, text=kacc, bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .62, rely = .5, anchor = W)
+
+		# Accuracy for perceptron
+		label = Label(self, text= "				", bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .51, rely = .6, anchor = W)
+		label = Label(self, text= pacc, bg='cadet blue', fg = "white", font = result_font)
+		label.place(relx = .51, rely = .6, anchor = W)
+
+# This is where the results of the single message tests can be seen by the user.
 class ResultPage(Frame):
 	def __init__(self, parent, controller):
 		Frame.__init__(self, parent)

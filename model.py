@@ -6,7 +6,10 @@ from normalize import *
 # import ui as u
 #==================================================================#
 
-
+#Initialize train_y in case no training occurs
+train_y = np.zeros(289)
+train_y[0:240] = -1
+train_y[241:288] = 1
 #=============================KNN Model============================#
 
 # Distance between instances x1 and x2
@@ -57,9 +60,6 @@ def runTest(test_x, test_y, train_x, train_y, k):
 	return acc
 
 #==================================================================#
-
-
-
 
 
 
@@ -115,28 +115,43 @@ def predict_perceptron(model, x):
 
 #==================================================================#
 
+# ============================Single Email============================
+def predict_single(model, default, single):
+	k = 6
+	vec = extract_single(single, default)
+	storage_matrix = read_matrix(default)
+
+	#Run single knn
+	if model == 1:
+		prediction = classify(storage_matrix, train_y, k, vec)
+	#Run single perceptron
+	elif model == 2:
+		(wa, ba) = read_wb(default)
+		prediction = predict_perceptron( (wa,ba), vec)
+		if prediction < 0:
+			prediction = -1
+		else:
+			prediction = 1
+
+	return prediction
 
 
-
-
+#==================================================================#
 
 #=================================Model============================#
-# Type of model (1 = KNN, 2 = Perceptron, directory of training, directory of testing,
+# Type of model (1 = KNN, 2 = Perceptron), directory of training, directory of testing,
 # Total numbers of files, total numbers of ham, single entry to be scanned
-def model(model, default, training, testing, tot, ham, single):
-	# =================== File I/O ====================
-	# File Paths for default datasets
+def model(model, default, training, testing, tot, ham):
+	# File Paths for default datasets and file values
 	if default:
-		training = "./data/lingspam_public/bare/part1"
-		testing = "./data/lingspam_public/bare/part2"
-
-	# =================================================
+		training = "./data/lingspam_public/bare/part7"
+		testing = "./data/lingspam_public/bare/part10"
+		tot = 289
+		ham = 241
 
 
 	# =============== Feature Extraction ==============
-	# if not default:
-
-	# Read data from training
+	# # Read data from training
 	final_words_train = count_words(training)
 	train_x = extract_features(training, final_words_train)
 	
@@ -144,130 +159,65 @@ def model(model, default, training, testing, tot, ham, single):
 	final_words_test = count_words(testing)
 	test_x = extract_features(testing, final_words_test)
 
-	#Normalizing data here
-	# train_x, test_x = rangenorm(train_x, test_x)
-	# train_x, test_x = varnorm(train_x, test_x)
-	# train_x, test_x = exnorm(train_x, test_x)
+	store_dict(final_words_train, default) #Store the feature matrix in usrdata.txt
+	store_matrix(train_x, default) # Store the feature matrix in usrmatrix.txt
+
+	# Creating our labels, 1 indicates spam, -1 indicates ham
+	train_y = np.zeros(tot)
+	train_y[0:(ham-1)] = -1
+	train_y[ham:(tot-1)] = 1
+
+	# Creating our labels, 1 indicates spam, -1 indicates ham
+	test_y = np.zeros(tot)
+	test_y[0:(ham-1)] = -1
+	test_y[ham:(tot-1)] = 1
+
 
 	# =================================================
 
+	# #SINGLE STUFFF
+	
+	# ham_vector = extract_single(single)
+	# storage_matrix = read_matrix()
 
-	# ============================Single Email============================
-
-	test_dict = read_dict()
-
-	# print("Starting dictionary extraction")
-	# for i in range(len(test_dict)):
-	# 	if test_dict[i] != final_words_train[i][0]:
-	# 		print(test_dict[i], final_words_train[i][0])
-	# print("Dictionary extraction done")
-
-	ham_vector = extract_single(single)
-
-	# print("Extracted ham_vector is:", ham_vector)
-	# print("Length of ham_vector is:", len(ham_vector))
-	# print("train_x[0] is:", train_x[0])
-	# print("Length of train_x[0] is:", len(train_x[0]))
-
-	# print("Testing single email")
-	# count = 0
-	# for i in range(len(ham_vector)):
-	# 	# print(ham_vector[i], train_x[0][i])
-	# 	if ham_vector[i] != train_x[0][i]:
-	# 		count += 1
-	# 		print("Error^^^")
-	# print("Single email testing complete.")
-	# print("Final count is:", count)
 
 	# ====================================================================
 
 
 	# ==================== Storage =============== =====
+	#Store the feature matrix in data.txt if its the default dataset
+	# and usrdata.txt if its the users inputed datasets
+	store_dict(final_words_train, default) 
+	new_words = read_dict(default)
 
-	store_dict(final_words_train) #Store the feature matrix in data.txt
-	new_words = read_dict()
-
-	store_matrix(train_x) # Store the feature matrix in matrix.txt
-	new_matrix = read_matrix()
-
-	#Checking storage
-	# print("Retrieving from storage.")
-
-	# for i in range(len(new_matrix)):
-	# 	for j in range(len(new_matrix[0])):
-	# 		if train_x[i][j] != new_matrix[i][j]:
-	# 			print("Not the same in storage.")
-
-	# print("Done retrieving from storage.")
+	# Store the feature matrix in matrix.txt if default else usrmatrix.txt
+	store_matrix(train_x, default) 
+	new_matrix = read_matrix(default)
 
 	# =================================================
-	if default:
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		train_y = np.zeros(289)
-		train_y[0:240] = -1
-		train_y[241:288] = 1
-
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		test_y = np.zeros(289)
-		test_y[0:240] = -1
-		test_y[241:288] = 1
-	else:
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		train_y = np.zeros(tot)
-		train_y[0:(ham-1)] = -1
-		train_y[ham:(tot-1)] = 1
-
-		# Creating our labels, 1 indicates spam, -1 indicates ham
-		test_y = np.zeros(tot)
-		test_y[0:(ham-1)] = -1
-		test_y[ham:(tot-1)] = 1
+		
 
 
 	if model == 1:
-
-
 		#===============================KNN==================================
-
-		#default accuracy from previous testing 
-		acc = 0.8263888888888888
 		k = 15
-		# print("Starting KNN testing")
-
 		acc = runTest(test_x, test_y, train_x, train_y, k)
-
-
-
-
-		# print("KNN testing done")
-		# print("Accuracy:", acc)
-
-		predict1 = classify(new_matrix, train_y, 1, ham_vector)
-		print("Ham Predication:", predict1)
-
-		# spam_vector = extract_single(single_spam)
-		# predict2 = classify(new_matrix, train_y, 1, spam_vector)
-		# print("Spam Predication:", predict2)
-
-		return acc, predict1
-
+		return acc
 		#====================================================================
-
-	
 
 	elif model == 2:
 
 		#============================Perceptron==============================
-
-
 		(w,b) = train_perceptron(train_x, train_y, 100)
+		store_w(w, default)
+		store_b(b, default)
 
 		correct = 0
 		for (x,y) in zip(test_x, test_y):
-			activation = predict_perceptron( (w,b), x )
+			activation = predict_perceptron( (w,b), x)
 			if activation * y > 0:
 				correct += 1
 		acc = float(correct)/len(test_y)
-		# print("Accuracy: ",acc)
 		return acc
 
 		#====================================================================
@@ -281,9 +231,14 @@ def model(model, default, training, testing, tot, ham, single):
 
 # For testing
 
-# accuracy = model(2, 1, "", "", 0, 0, 0)
-# print("Accuracy: ", accuracy)
+# acc = model(2, 1, "", "", 0, 0, "./data/test_spam.txt")
+# print("Accuracy: ", acc)
 
+# acc = model(2, 1, "./data/lingspam_public/bare/part7", "./data/lingspam_public/bare/part10", 289, 241)
+# print("Accuracy: ", acc)
+
+# predict = predict_single(1, 1, "./data/test_spam.txt")
+# print("Perceptron prediction: ", predict)
 
 
 
