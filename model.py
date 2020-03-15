@@ -14,7 +14,6 @@ train_y[241:288] = 1
 
 # Distance between instances x1 and x2
 def dist(x1, x2):
-	# TODO: YOUR CODE HERE
 	dist = np.linalg.norm(x1-x2)
 	dist = dist**2
 	return dist
