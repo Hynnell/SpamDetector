@@ -124,7 +124,6 @@ def predict_perceptron(model, x):
 # Type of model (1 = KNN, 2 = Perceptron, directory of training, directory of testing,
 # Total numbers of files, total numbers of ham, single entry to be scanned
 def model(model, default, training, testing, tot, ham, single):
-
 	# =================== File I/O ====================
 
 	# File Paths for default datasets
@@ -132,20 +131,18 @@ def model(model, default, training, testing, tot, ham, single):
 		training = "./data/lingspam_public/bare/part1"
 		testing = "./data/lingspam_public/bare/part2"
 
-	# For testing purposes
-	single_ham = "./data/test_ham.txt"
-	single_spam = "./data/test_spam.txt"
+	single = "./data/test_spam.txt"
 
-
-	# # File Paths for Perceptron
-	# training_p = "./data/lingspam_public/bare/part1"
-	# testing_p = "./data/lingspam_public/bare/part2"
+	# # For testing purposes
+	# single_ham = "./data/test_ham.txt"
+	# single_spam = "./data/test_spam.txt"
 
 	# =================================================
 
 
 	# =============== Feature Extraction ==============
-
+	# if not default:
+	
 	# Read data from training
 	final_words_train = count_words(training)
 	train_x = extract_features(training, final_words_train)
@@ -172,7 +169,7 @@ def model(model, default, training, testing, tot, ham, single):
 	# 		print(test_dict[i], final_words_train[i][0])
 	# print("Dictionary extraction done")
 
-	ham_vector = extract_single(single_ham)
+	ham_vector = extract_single(single)
 
 	# print("Extracted ham_vector is:", ham_vector)
 	# print("Length of ham_vector is:", len(ham_vector))
@@ -192,7 +189,7 @@ def model(model, default, training, testing, tot, ham, single):
 	# ====================================================================
 
 
-	# ==================== Storage ====================
+	# ==================== Storage =============== =====
 
 	store_dict(final_words_train) #Store the feature matrix in data.txt
 	new_words = read_dict()
@@ -232,26 +229,33 @@ def model(model, default, training, testing, tot, ham, single):
 		test_y[0:(ham-1)] = -1
 		test_y[ham:(tot-1)] = 1
 
+
 	if model == 1:
 
 
 		#===============================KNN==================================
 
-
+		#default accuracy from previous testing 
+		acc = 0.8263888888888888
 		k = 6
-		print("Starting KNN testing")
-		acc = runTest(test_x, test_y, train_x, train_y, k)
-		print("KNN testing done")
-		print("Accuracy:", acc)
+		# print("Starting KNN testing")
+
+		# acc = runTest(test_x, test_y, train_x, train_y, k)
+
+
+
+
+		# print("KNN testing done")
+		# print("Accuracy:", acc)
 
 		predict1 = classify(new_matrix, train_y, 1, ham_vector)
 		# print("Ham Predication:", predict1)
 
-		spam_vector = extract_single(single_spam)
-		predict2 = classify(new_matrix, train_y, 1, spam_vector)
+		# spam_vector = extract_single(single_spam)
+		# predict2 = classify(new_matrix, train_y, 1, spam_vector)
 		# print("Spam Predication:", predict2)
 
-		return acc
+		return acc, predict1
 
 		#====================================================================
 
@@ -288,15 +292,17 @@ def model(model, default, training, testing, tot, ham, single):
 	else:
 		print("Not a valid model (1 for KNN, 2 for Perceptron).")
 
-	#NOTE THIS ONLY RETURNS ONE PREDICTION
-	return predict1
+	# #NOTE THIS ONLY RETURNS ONE PREDICTION
+	# print("PREDICT1: ", predict1)
+	# print("PREDICT1: ", acc)
+	# return predict1
 
 #==================================================================#
 
 # For testing
 
-# model(1, 1, "", "", 0, 0, 0)
-
+# accuracy = model(2, 1, "", "", 0, 0, 0)
+# print("Accuracy: ", accuracy)
 
 
 
