@@ -142,7 +142,7 @@ class AboutPage(Frame):
 		label.place(relx = .5, rely = .27, anchor = CENTER)
 
 		# About this project
-		about = "This program was created by Lucas Hyatt and Olivia Pannell for CIS 433.\nIt is intended to help keep yourself safe from malicious attacks by determining whether messages are spam or not."
+		about = "This program was created by Lucas Hyatt and Olivia Pannell.\nIt is intended to help keep yourself safe from malicious attacks by determining whether messages are spam or not."
 		label = Label(self, text=about, bg='cadet blue', font = ("Helvetica", 18, "bold italic"), wraplength = 500, justify = LEFT)
 		label.place(relx = .5, rely = .42, anchor = N)
 
@@ -192,11 +192,11 @@ class StartPage(Frame):
 		#Select single message that will be scanned for spam
 		label = Label(self, text="Choose Message to Scan:", bg='cadet blue', fg = "white", font = info_font)
 		label.place(relx = .2, rely = .6, anchor = W)
-		file = Button(self, padx=80, text="Find!", highlightbackground='cadet blue', command = input_file)
+		file = Button(self, padx=65, text="Choose..", highlightbackground='cadet blue', command = input_file)
 		file.place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
 		#Button for training data
-		detect_spam = Button(self, padx=30, width=5, text="Train!", highlightbackground='lightblue2', command = lambda: self.errorcheck(parent, controller))
+		detect_spam = Button(self, padx=30, width=5, text="Test!", highlightbackground='lightblue2', command = lambda: self.errorcheck(parent, controller))
 		detect_spam.place(relx = 1.0, rely = 1.0, anchor = SE)
 
 	def errorcheck(self, parent, controller):
@@ -363,55 +363,9 @@ class DatasetPage(Frame):
 		tot = int(totalent.get())
 		ham = int(hament.get())
 
-		#Tells user their information was saved.
-		# self.popup(parent, controller)
-
 		#Routes user to the result data that will give the accuracy of the model
 		root.pages[DSResultPage].load(parent, controller, opt2)
 		controller.show_frame(DSResultPage)
-
-
-	# Popup window for user to know their data has been saved.
-	def popup(self, parent, controller):
-		global filepath, opt2
-		pacc = "Model Not Trained"
-		kacc = "Model Not Trained"
-		# #Calls Train nearest neighbor
-		# if opt2.get() == algorithms[0] or opt2.get() == algorithms[2]:
-		# 	print("default: ", default, "\nTr: ", tr, "\ntot: ", tot)
-		# 	kacc = m.model(1, default, tr, te, tot, ham)
-		# #Calls Train Perceptron
-		# if opt2.get() == algorithms[1] or opt2.get() == algorithms[2]:
-		# 	pacc = m.model(2, default, tr, te, tot, ham)
-
-		#Resets opt in preparation for another entry
-		opt2.set("Choose..")
-
-		top = Toplevel()
-		top.geometry('320x170')
-		top.resizable(False, False)
-		top.title("Dataset Training Completed")
-		top.config(bg='deepskyblue4')
-
-		label = Label(top, text="Dataset Information:", bg='deepskyblue4', fg = "white", font = small_title_font)
-		label.place(relx = .5, rely = .1, anchor = N)
-
-		label = Label(top, text="Nearest Neighbor Accuracy (%): ", bg='cadet blue', fg = "grey19", font = small_title_font)
-		label.place(relx = .05, rely = .4, anchor = W)
-
-		label = Label(top, text="Perceptron Accuracy (%): ", bg='cadet blue', fg = "grey19", font = small_title_font)
-		label.place(relx = .05, rely = .6, anchor = W)
-
-		label = Label(top, text= kacc, bg='cadet blue', fg = "white", font = button_font)
-		label.place(relx = .57, rely = .5, anchor = W)
-		label = Label(top, text= pacc, bg='cadet blue', fg = "white", font = button_font)
-		label.place(relx = .57, rely = .7, anchor = W)
-
-		#Bottom part of screen
-		fr1 = Frame(top, width = 400, height = 40, bg = 'lightblue2')
-		fr1.place(relx=0.5, rely=1.0, anchor=S)
-		b1 = Button(fr1, text="Go Back", highlightbackground="lightblue2", padx=50, command=lambda: [quitWindow(top), controller.show_frame(MainMenu)])
-		b1.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 # This is where the results of the training can be seen by the user.
 class DSResultPage(Frame):
