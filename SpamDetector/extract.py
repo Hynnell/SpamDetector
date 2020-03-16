@@ -225,8 +225,12 @@ def extract_single(file, default):
 	return features_vector # Singular feature vector for email. 
 
 
+'''
+Sources: 
 
+https://www.kdnuggets.com/2017/03/email-spam-filtering-an-implementation-with-python-and-scikit-learn.html
 
+'''
 
 
 
